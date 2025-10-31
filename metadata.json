@@ -1,0 +1,5 @@
+{
+  "name": "AI Health Advisor",
+  "description": "An AI-powered personal health assistant that provides personalized health, diet, and lifestyle recommendations based on user health conditions, habits, and food intake. It includes AI-powered analysis of food images and a predictive life impact score.",
+  "requestFramePermissions": []
+}
