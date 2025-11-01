@@ -3,46 +3,44 @@ import type { UserProfile, DailyHabits, LifeImpact } from '../types';
 import { predictLifeImpact, getMentalHealthTip } from '../services/geminiService';
 import Card from './Card';
 import Spinner from './Spinner';
-import Badge from './Badge'; // Import the new Badge component
+import Badge from './Badge';
 
 interface LifeImpactDashboardProps {
   userProfile: UserProfile;
+  habits: DailyHabits;
+  onHabitsChange: (habits: DailyHabits) => void;
 }
 
 // SVG Icons for Badges
 const SleepIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
     </svg>
 );
 const FitnessIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12.75 19.5l-2.25-2.25A4.5 4.5 0 017.5 12.75l-2.25-2.25a4.5 4.5 0 016.364-6.364l2.25 2.25a4.5 4.5 0 010 6.364l-2.25 2.25a4.5 4.5 0 01-6.364 0z" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path d="M12.375 2.25c-4.975 0-9.042 3.97-9.042 8.854 0 4.152 2.763 7.64 6.494 8.61v-2.128c-2.22-.96-3.743-3.153-3.743-5.72 0-3.352 2.71-6.088 6.042-6.088s6.042 2.736 6.042 6.089c0 2.566-1.524 4.758-3.743 5.719v2.128c3.73-.97 6.494-4.458 6.494-8.61C21.417 6.22 17.35 2.25 12.375 2.25z" />
+        <path d="M12.375 21.75a.75.75 0 01-.75-.75V12a.75.75 0 011.5 0v9a.75.75 0 01-.75.75z" />
+        <path d="M16.125 14.25a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75z" />
+        <path d="M8.625 14.25a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75z" />
     </svg>
 );
 const DietIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
     </svg>
 );
 const TrophyIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9a9.75 9.75 0 1 0 0-13.5h9a9.75 9.75 0 1 0 0 13.5zM16.5 18.75v-1.5m-9-10.5v-1.5m0 13.5v-1.5m0-10.5h9m-9 3.75h9m-9 3.75h9m-9 3.75h9" />
     </svg>
 );
 
 
-const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile }) => {
+const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile, habits, onHabitsChange }) => {
   // @ts-ignore
-  const { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } = window.Recharts || {};
-
-  const [habits, setHabits] = useState<DailyHabits>({
-    exerciseFrequency: '1-2 times a week',
-    sleepHours: 7,
-    dietQuality: 'average',
-    mood: 'neutral',
-  });
+  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = window.Recharts || {};
+  
   const [impact, setImpact] = useState<LifeImpact | null>(null);
   const [mentalHealthTip, setMentalHealthTip] = useState<string | null>(null);
   const [loadingTip, setLoadingTip] = useState(false);
@@ -93,12 +91,12 @@ const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile }
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
-    setHabits(prev => ({ ...prev, [name]: name === 'sleepHours' ? Number(value) : value }));
+    onHabitsChange({ ...habits, [name]: name === 'sleepHours' ? Number(value) : value });
   };
   
   const handleMoodChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newMood = e.target.value as DailyHabits['mood'];
-    setHabits(prev => ({ ...prev, mood: newMood }));
+    onHabitsChange({ ...habits, mood: newMood });
     setMentalHealthTip(null);
     setLoadingTip(true);
     try {
@@ -123,7 +121,7 @@ const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile }
         date: new Date().toISOString(),
       };
       setImpact(result);
-      setPredictionHistory(prev => [...prev, newEntry]);
+      setPredictionHistory(prev => [...prev, newEntry].slice(-10)); // Keep history to last 10 entries
     } catch (err) {
       setError('Failed to predict life impact. Please try again.');
       console.error(err);

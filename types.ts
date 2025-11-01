@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   age: number;
   gender: 'male' | 'female' | 'other';
@@ -7,7 +6,7 @@ export interface UserProfile {
   conditions: string; // Comma-separated
   cuisinePreferences?: string;
   dietaryRestrictions?: string;
-  healthGoal: 'weightLoss' | 'muscleGain' | 'maintain' | 'healthyHabits';
+  healthGoal: 'weightLoss' | 'muscleGain' | 'weightGain' | 'maintain' | 'healthyHabits';
 }
 
 export interface DailyHabits {
@@ -82,4 +81,12 @@ export interface LifeImpact {
       advice: string;
   }[];
   summary: string;
+}
+
+export interface HealthLogEntry {
+  id: string;
+  date: string;
+  condition: string;
+  notes: string;
+  severity: 1 | 2 | 3 | 4 | 5;
 }

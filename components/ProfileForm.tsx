@@ -68,6 +68,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit }) => {
                 <select name="healthGoal" id="healthGoal" value={profile.healthGoal || 'healthyHabits'} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     <option value="weightLoss">Weight Loss</option>
                     <option value="muscleGain">Muscle Gain</option>
+                    <option value="weightGain">Gain Weight</option>
                     <option value="maintain">Maintain Weight</option>
                     <option value="healthyHabits">Build Healthy Habits</option>
                 </select>
