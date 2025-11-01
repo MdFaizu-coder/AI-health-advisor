@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import type { UserProfile, DailyHabits, Recommendations as RecommendationsType, LifeImpact } from '../types';
+import type { UserProfile, DailyHabits } from '../types';
 import Recommendations from './Recommendations';
 import FoodAnalyzer from './FoodAnalyzer';
 import LifeImpactDashboard from './LifeImpactDashboard';
 import HealthLog from './HealthLog';
-import HealthReport from './HealthReport';
 import { getDailyHealthTip, getRecommendations, predictLifeImpact } from '../services/geminiService';
+import { generateHealthReportPdf } from '../services/pdfService';
 import Card from './Card';
 import Spinner from './Spinner';
-
-// @ts-ignore
-const { jsPDF } = window.jspdf;
-declare const html2canvas: any;
 
 interface DashboardProps {
   userProfile: UserProfile;
@@ -32,7 +28,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile }) => {
   });
   
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [reportData, setReportData] = useState<{ recommendations: RecommendationsType; impact: LifeImpact } | null>(null);
 
   useEffect(() => {
     const fetchTip = async () => {
@@ -49,27 +44,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile }) => {
     fetchTip();
   }, [userProfile]);
   
-  useEffect(() => {
-    if (reportData) {
-      const generatePdf = async () => {
-        const reportElement = document.getElementById('health-report-content');
-        if (reportElement) {
-          const canvas = await html2canvas(reportElement, { scale: 2 });
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          pdf.save(`Health_Report_${new Date().toLocaleDateString()}.pdf`);
-        }
-        setReportData(null); // Clean up after generation
-        setIsGeneratingReport(false);
-      };
-      // Timeout to ensure the DOM is painted before capturing
-      setTimeout(generatePdf, 100);
-    }
-  }, [reportData]);
-  
   const handleDownloadReport = async () => {
     setIsGeneratingReport(true);
     try {
@@ -77,14 +51,14 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile }) => {
         getRecommendations(userProfile),
         predictLifeImpact(userProfile, habits)
       ]);
-      setReportData({ recommendations, impact });
+      generateHealthReportPdf(userProfile, habits, recommendations, impact);
     } catch (error) {
-      console.error("Failed to generate report data:", error);
+      console.error("Failed to generate report:", error);
       alert("There was an error generating your report. Please try again.");
+    } finally {
       setIsGeneratingReport(false);
     }
   };
-
 
   const calculateBmi = () => {
     if (userProfile.height > 0) {
@@ -136,16 +110,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile }) => {
 
   return (
     <div className="space-y-6">
-       {reportData && (
-        <div style={{ position: 'absolute', left: '-9999px', top: 0, width: '210mm' }}>
-            <HealthReport 
-                userProfile={userProfile} 
-                habits={habits} 
-                recommendations={reportData.recommendations} 
-                impact={reportData.impact} 
-            />
-        </div>
-      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <div className="p-4 text-center">
