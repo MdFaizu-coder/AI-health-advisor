@@ -1,12 +1,65 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🩺 AI Health Assistant and Advisor
 
-# Run and deploy your AI Studio app
+## 📘 Overview
+The **AI Health Assistant and Advisor** is a web-based application designed to help users understand their health conditions through AI-driven insights.  
+By analyzing basic user inputs and medical symptoms, the system predicts possible health issues and provides personalized diet and lifestyle recommendations.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/drive/1eeejKwKLFqoqHk3uCgU573WumHrSt25E
+## 🎯 Problem Statement
+People often ignore early symptoms or search for unreliable information online.  
+This application helps bridge that gap by providing **AI-based, quick, and reliable health advice** accessible to everyone.
+
+---
+
+## 💡 Key Features
+- 🧠 AI-powered health analysis using Google’s Generative AI API  
+- 🩹 Personalized diet and health suggestions  
+- 💬 Natural language chat-style interaction  
+- 📊 Clean and responsive user interface built with React  
+- ⚙️ Lightweight, fast, and accessible from any device
+
+---
+
+## 🧰 Tech Stack
+| Category | Technology Used |
+|-----------|-----------------|
+| Frontend | React.js |
+| Backend | Node.js |
+| AI Model | Google Gemini / Generative AI API |
+| Hosting | GitHub Pages / Localhost |
+| Tools | VS Code, Git, npm |
+
+---
+
+## 🚀 How It Works
+1. The user enters basic health details and symptoms.  
+2. The AI model processes the data and predicts possible health conditions.  
+3. The app provides a summarized diagnosis along with diet, exercise, and precaution suggestions.  
+4. Users can chat further for clarification or related health advice.
+
+---
+
+## 👨‍💻 Developed By
+**Name:** Mohammed Faizuddin
+**Email:** faizuddinmohammed1207@gmail.com  
+**College:** AMC Engineering College (bangalore) 
+**Department:** Computer Science (Data Science)  
+**Project Title:** AI Health Assistant and Advisor  
+
+---
+
+## 🔗 Connect With Me
+**LinkedIn:** (www.linkedin.com/in/mohammed-faizuddin-36815730b)  
+
+---
+
+## 🧾 Note
+This project was independently developed for academic purposes.  
+It demonstrates the integration of artificial intelligence into healthcare assistance using modern web technologies.
+
+---
+
 
 ## Run Locally
 
