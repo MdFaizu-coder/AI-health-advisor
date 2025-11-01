@@ -23,10 +23,12 @@ export async function getRecommendations(profile: UserProfile): Promise<Recommen
     - Weight: ${profile.weight} kg
     - Height: ${profile.height} cm
     - Medical Conditions: ${profile.conditions}
+    - Primary Health Goal: ${profile.healthGoal}
     - Preferred Cuisines: ${profile.cuisinePreferences || 'None specified'}
     - Dietary Restrictions: ${profile.dietaryRestrictions || 'None specified'}
 
-    The diet plan should strongly consider the user's cuisine preferences and strictly adhere to any dietary restrictions.
+    The diet plan and workouts should be tailored to achieve the user's primary health goal.
+    The diet plan should also strongly consider the user's cuisine preferences and strictly adhere to any dietary restrictions.
     Provide the response in a structured JSON format.
   `;
 
@@ -147,12 +149,14 @@ export async function predictLifeImpact(profile: UserProfile, habits: DailyHabit
     const prompt = `
       Predict the long-term health impact for a user with the following profile and habits.
       Profile:
-      - Age: ${profile.age}, Gender: ${profile.gender}, Weight: ${profile.weight}kg, Height: ${profile.height}cm, Conditions: ${profile.conditions}
+      - Age: ${profile.age}, Gender: ${profile.gender}, Weight: ${profile.weight}kg, Height: ${profile.height}cm, Conditions: ${profile.conditions}, Goal: ${profile.healthGoal}
       Habits:
       - Exercise: ${habits.exerciseFrequency}
       - Sleep: ${habits.sleepHours} hours/night
       - Diet Quality: ${habits.dietQuality}
+      - Recent Mood: ${habits.mood}
 
+      Consider the user's recent mood as an indicator of mental well-being, which can affect their overall health score.
       Provide a life impact score (0-100), identify key risk factors and positive factors with their impact level (High, Medium, Low) and advice, and give a brief summary. Respond in a structured JSON format.
     `;
     
@@ -193,5 +197,45 @@ export async function predictLifeImpact(profile: UserProfile, habits: DailyHabit
         }
     });
 
+    return cleanJson(response.text);
+}
+
+export async function getMentalHealthTip(mood: string): Promise<{ tip: string }> {
+    const prompt = `A user is feeling ${mood}. Provide a single, concise, and actionable mindfulness tip or a short relaxing activity suggestion to help them. The response should be empathetic and encouraging. Respond in a structured JSON format with a single key "tip".`;
+    
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                    tip: { type: Type.STRING },
+                }
+            }
+        }
+    });
+
+    return cleanJson(response.text);
+}
+
+export async function getDailyHealthTip(profile: UserProfile): Promise<{ tip: string }> {
+    const prompt = `Based on the user's profile (Age: ${profile.age}, Conditions: ${profile.conditions}, Goal: ${profile.healthGoal}), provide a single, unique, and interesting "Tip of the Day". It should be short (1-2 sentences) and easy to understand. Respond in a structured JSON format with a single key "tip".`;
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                    tip: { type: Type.STRING },
+                }
+            }
+        }
+    });
+    
     return cleanJson(response.text);
 }

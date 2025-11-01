@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { UserProfile, DailyHabits, LifeImpact } from '../types';
-import { predictLifeImpact } from '../services/geminiService';
+import { predictLifeImpact, getMentalHealthTip } from '../services/geminiService';
 import Card from './Card';
 import Spinner from './Spinner';
 import Badge from './Badge'; // Import the new Badge component
@@ -41,8 +41,11 @@ const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile }
     exerciseFrequency: '1-2 times a week',
     sleepHours: 7,
     dietQuality: 'average',
+    mood: 'neutral',
   });
   const [impact, setImpact] = useState<LifeImpact | null>(null);
+  const [mentalHealthTip, setMentalHealthTip] = useState<string | null>(null);
+  const [loadingTip, setLoadingTip] = useState(false);
   const [predictionHistory, setPredictionHistory] = useState<Array<{ impact: LifeImpact; habits: DailyHabits; date: string }>>([]);
   const [earnedBadges, setEarnedBadges] = useState({ sleep: false, fitness: false, diet: false });
   const [loading, setLoading] = useState(false);
@@ -92,6 +95,22 @@ const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile }
     const { name, value } = e.target;
     setHabits(prev => ({ ...prev, [name]: name === 'sleepHours' ? Number(value) : value }));
   };
+  
+  const handleMoodChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newMood = e.target.value as DailyHabits['mood'];
+    setHabits(prev => ({ ...prev, mood: newMood }));
+    setMentalHealthTip(null);
+    setLoadingTip(true);
+    try {
+        const result = await getMentalHealthTip(newMood);
+        setMentalHealthTip(result.tip);
+    } catch (err) {
+        console.error("Failed to get mental health tip", err);
+        setMentalHealthTip("Take a few deep breaths, focusing on the sensation of air entering and leaving your body.");
+    } finally {
+        setLoadingTip(false);
+    }
+  };
 
   const handlePredict = async () => {
     setLoading(true);
@@ -138,7 +157,7 @@ const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile }
     <Card>
       <div className="p-6">
         <h2 className="text-3xl font-bold text-center mb-6">Life Impact Prediction</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 items-end">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Exercise Frequency</label>
               <select name="exerciseFrequency" value={habits.exerciseFrequency} onChange={handleChange} className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
@@ -160,7 +179,27 @@ const LifeImpactDashboard: React.FC<LifeImpactDashboardProps> = ({ userProfile }
                 <option>unhealthy</option>
               </select>
             </div>
+            <div className="lg:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">How are you feeling?</label>
+              <select name="mood" value={habits.mood} onChange={handleMoodChange} className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <option value="happy">Happy</option>
+                <option value="neutral">Neutral</option>
+                <option value="sad">Sad</option>
+                <option value="anxious">Anxious</option>
+                <option value="stressed">Stressed</option>
+              </select>
+            </div>
         </div>
+         {(loadingTip || mentalHealthTip) && (
+            <div className="mb-6">
+                <Card className="bg-indigo-50 dark:bg-indigo-900/40">
+                    <div className="p-4 text-center">
+                        {loadingTip && <p className="text-sm text-indigo-700 dark:text-indigo-200">Finding a tip for you...</p>}
+                        {mentalHealthTip && <p className="text-sm text-indigo-800 dark:text-indigo-200">{mentalHealthTip}</p>}
+                    </div>
+                </Card>
+            </div>
+        )}
         <div className="text-center mb-8">
             <button onClick={handlePredict} disabled={loading} className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed flex items-center justify-center mx-auto">
             {loading ? <Spinner /> : 'Predict My Health Score'}

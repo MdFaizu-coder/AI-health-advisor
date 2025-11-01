@@ -7,12 +7,14 @@ export interface UserProfile {
   conditions: string; // Comma-separated
   cuisinePreferences?: string;
   dietaryRestrictions?: string;
+  healthGoal: 'weightLoss' | 'muscleGain' | 'maintain' | 'healthyHabits';
 }
 
 export interface DailyHabits {
   exerciseFrequency: 'daily' | '3-4 times a week' | '1-2 times a week' | 'rarely';
   sleepHours: number;
   dietQuality: 'healthy' | 'average' | 'unhealthy';
+  mood: 'happy' | 'neutral' | 'sad' | 'anxious' | 'stressed';
 }
 
 export interface DietRecommendation {

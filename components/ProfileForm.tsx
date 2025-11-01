@@ -15,6 +15,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit }) => {
     conditions: 'None',
     cuisinePreferences: '',
     dietaryRestrictions: '',
+    healthGoal: 'healthyHabits',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -24,7 +25,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (profile.age && profile.gender && profile.weight && profile.height && profile.conditions) {
+    if (profile.age && profile.gender && profile.weight && profile.height && profile.conditions && profile.healthGoal) {
       onSubmit(profile as UserProfile);
     }
   };
@@ -61,6 +62,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit }) => {
             <div>
               <label htmlFor="conditions" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Medical Conditions (e.g., Diabetes, High BP, None)</label>
               <textarea name="conditions" id="conditions" value={profile.conditions || ''} onChange={handleChange} required rows={3} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+            </div>
+             <div>
+                <label htmlFor="healthGoal" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Health Goal</label>
+                <select name="healthGoal" id="healthGoal" value={profile.healthGoal || 'healthyHabits'} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="weightLoss">Weight Loss</option>
+                    <option value="muscleGain">Muscle Gain</option>
+                    <option value="maintain">Maintain Weight</option>
+                    <option value="healthyHabits">Build Healthy Habits</option>
+                </select>
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
